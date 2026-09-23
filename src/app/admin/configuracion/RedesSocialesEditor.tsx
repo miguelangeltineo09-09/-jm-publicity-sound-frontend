@@ -249,7 +249,19 @@ export default function RedesSocialesEditor({ token }: RedesSocialesEditorProps)
 
               <IconoRedSocial nombre={red.nombre} className="h-8 w-8" />
 
-              <div className="flex-1">
+              {/* "min-w-0" (antes solo "flex-1"): un item flex, por
+                  default, no se encoge por debajo del ancho que necesita
+                  su CONTENIDO sin cortar ("overflow: visible" es el
+                  default) — el "truncate" del <p> de la url de más abajo
+                  no alcanzaba a evitar el desborde porque ese recorte
+                  vive en el hijo, no en este contenedor, que seguía
+                  reservando el ancho completo de la url (a veces larga,
+                  con parámetros) para calcular el layout de la fila.
+                  "min-w-0" le permite a este contenedor encogerse hasta
+                  0 si hace falta, y ahí sí el "truncate" del hijo puede
+                  recortar visualmente el texto en vez de empujar
+                  "Editar"/"Eliminar" fuera de la pantalla. */}
+              <div className="min-w-0 flex-1">
                 {enEdicion ? (
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <input

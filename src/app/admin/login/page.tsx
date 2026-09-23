@@ -47,11 +47,16 @@ function FormularioLogin() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6">
+    // "px-4 sm:px-6" (antes "px-6" fijo): en un celular muy angosto
+    // (320px), 24px de margen a cada lado ya dejaban muy poco ancho útil
+    // para la tarjeta de abajo; desde "sm" queda igual que antes.
+    <div className="flex min-h-screen items-center justify-center px-4 sm:px-6">
       {/* El fondo con degradado sutil ya lo pinta el <body> (globals.css),
           igual que en el sitio público: esta tarjeta solo necesita su
-          propio fondo "surface" para destacar sobre él. */}
-      <div className="w-full max-w-sm rounded-xl border border-white/10 bg-background-surface p-8">
+          propio fondo "surface" para destacar sobre él. "p-6 sm:p-8"
+          (antes "p-8" fijo): mismo motivo que el padding externo de
+          arriba, un poco más de ancho útil en pantallas muy chicas. */}
+      <div className="w-full max-w-sm rounded-xl border border-white/10 bg-background-surface p-6 sm:p-8">
         {/* Logo real (antes era el nombre en texto plano). */}
         <img src="/logo.svg" alt="JM Publicity Sound" className="mx-auto h-12 w-auto" />
         <p className="mt-3 text-center text-sm text-muted">Panel de administración</p>

@@ -113,7 +113,12 @@ export default function EquiposAdminPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      {/* "flex-wrap gap-3" (antes sin wrap): en un celular angosto, el
+          título+subtítulo y el botón "Nuevo equipo" ya no entran en una
+          sola fila — sin "flex-wrap" el botón se recortaba o forzaba
+          scroll horizontal de toda la página en vez de simplemente pasar
+          a su propia línea debajo. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Equipos</h1>
           <p className="mt-1 text-muted">Catálogo de equipos disponibles para alquiler.</p>
@@ -144,21 +149,41 @@ export default function EquiposAdminPage() {
         {!cargando && error && <ErrorMessage message={error} />}
 
         {!cargando && !error && (
-          <table className="w-full border-separate border-spacing-y-2 text-left text-sm">
-            {/* Encabezado en el mismo tono "surface" que las filas, pero en
-                mayúsculas/tenue para que se siga leyendo como encabezado y
-                no como una fila más de datos. */}
-            <thead>
-              <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
-                <th className="rounded-l-lg px-3 py-3">Imagen</th>
-                <th className="px-3 py-3">Nombre</th>
-                <th className="px-3 py-3">Categoría</th>
-                <th className="px-3 py-3">Precio</th>
-                <th className="px-3 py-3">Disponible</th>
-                <th className="rounded-r-lg px-3 py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
+          // --- Contenedor con scroll horizontal propio (patrón responsivo
+          // aplicado por igual a TODAS las tablas del panel: Equipos,
+          // Categorías, Provincias, Reservas, Reseñas) ---
+          // Esta tabla tiene 6 columnas con contenido que no se puede
+          // comprimir mucho más (imagen, nombre, categoría, precio, switch,
+          // dos botones de acción): en un celular de 320-375px no entran
+          // todas sin achicarse hasta ser ilegibles. En vez de eso, se deja
+          // que la tabla mantenga un ancho mínimo razonable
+          // ("min-w-[640px]") y sea este DIV el que scrollea horizontalmente
+          // ("overflow-x-auto") — el resto de la página (título, botones)
+          // no se mueve, solo la tabla en sí. "-mx-4 px-4 sm:mx-0 sm:px-0"
+          // es el mismo truco ya usado en los tabs de categoría del sitio
+          // público (ver FiltroEquipos.tsx): el scroll llega hasta el borde
+          // real de la pantalla en vez de quedar recortado por el padding
+          // del contenedor. El texto "Desliza..." es el indicador visual
+          // pedido, visible solo en pantallas chicas (desde "sm" la tabla
+          // ya suele entrar completa, así que no hace falta).
+          <div>
+            <p className="mb-2 text-xs text-muted sm:hidden">← Desliza para ver toda la tabla →</p>
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <table className="w-full min-w-[640px] border-separate border-spacing-y-2 text-left text-sm">
+                {/* Encabezado en el mismo tono "surface" que las filas, pero en
+                    mayúsculas/tenue para que se siga leyendo como encabezado y
+                    no como una fila más de datos. */}
+                <thead>
+                  <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
+                    <th className="rounded-l-lg px-3 py-3">Imagen</th>
+                    <th className="px-3 py-3">Nombre</th>
+                    <th className="px-3 py-3">Categoría</th>
+                    <th className="px-3 py-3">Precio</th>
+                    <th className="px-3 py-3">Disponible</th>
+                    <th className="rounded-r-lg px-3 py-3">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
               {equipos.map((equipo) => (
                 // Hover sutil hacia morado: ayuda a "leer" la fila sobre la
                 // que está el cursor en una tabla con varias columnas.
@@ -229,8 +254,10 @@ export default function EquiposAdminPage() {
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
 

@@ -171,21 +171,29 @@ export default function ResenasAdminPage() {
         {!cargando && error && <ErrorMessage message={error} />}
 
         {!cargando && !error && (
-          <table className="w-full border-separate border-spacing-y-2 text-left text-sm">
-            {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
-                tablas del panel (Equipos, Categorías, Reservas). */}
-            <thead>
-              <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
-                <th className="rounded-l-lg px-3 py-3">Cliente</th>
-                <th className="px-3 py-3">Equipo</th>
-                <th className="px-3 py-3">Calificación</th>
-                <th className="px-3 py-3">Comentario</th>
-                <th className="px-3 py-3">Estado</th>
-                <th className="px-3 py-3">Fecha</th>
-                <th className="rounded-r-lg px-3 py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
+          // Mismo patrón responsivo de scroll horizontal contenido que el
+          // resto de las tablas del panel (ver el comentario largo en
+          // admin/equipos/page.tsx). 7 columnas, incluida una de
+          // comentario libre: es de las anchas que definitivamente no
+          // entran en 320-375px sin este contenedor.
+          <div>
+            <p className="mb-2 text-xs text-muted sm:hidden">← Desliza para ver toda la tabla →</p>
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <table className="w-full min-w-[760px] border-separate border-spacing-y-2 text-left text-sm">
+                {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
+                    tablas del panel (Equipos, Categorías, Reservas). */}
+                <thead>
+                  <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
+                    <th className="rounded-l-lg px-3 py-3">Cliente</th>
+                    <th className="px-3 py-3">Equipo</th>
+                    <th className="px-3 py-3">Calificación</th>
+                    <th className="px-3 py-3">Comentario</th>
+                    <th className="px-3 py-3">Estado</th>
+                    <th className="px-3 py-3">Fecha</th>
+                    <th className="rounded-r-lg px-3 py-3">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
               {resenas.map((resena) => (
                 <tr
                   key={resena.id}
@@ -243,8 +251,10 @@ export default function ResenasAdminPage() {
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
 

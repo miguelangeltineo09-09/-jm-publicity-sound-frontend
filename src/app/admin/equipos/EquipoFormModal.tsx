@@ -196,7 +196,13 @@ export default function EquipoFormModal({
                 />
               </label>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* "grid-cols-1 sm:grid-cols-2" (antes "grid-cols-2" fijo):
+                  en un celular angosto, dos columnas dejaban cada campo
+                  (el número de precio y el dropdown de categoría, cuyo
+                  botón muestra el nombre completo de la categoría) con
+                  menos de 120px de ancho — suficiente para que el texto
+                  del dropdown se corte. Desde "sm" vuelven a ir lado a lado. */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-1 text-sm">
                   Precio
                   <input

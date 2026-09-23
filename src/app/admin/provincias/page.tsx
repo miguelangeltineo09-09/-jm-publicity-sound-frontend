@@ -127,16 +127,25 @@ export default function ProvinciasAdminPage() {
         {!cargando && error && <ErrorMessage message={error} />}
 
         {!cargando && !error && (
-          <table className="w-full border-separate border-spacing-y-2 text-left text-sm">
-            {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
-                tablas del panel (Equipos, Categorías, Reservas). */}
-            <thead>
-              <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
-                <th className="rounded-l-lg px-3 py-3">Provincia</th>
-                <th className="rounded-r-lg px-3 py-3">Precio de viaje (RD$)</th>
-              </tr>
-            </thead>
-            <tbody>
+          // Mismo patrón responsivo de scroll horizontal contenido que el
+          // resto de las tablas del panel (ver el comentario largo en
+          // admin/equipos/page.tsx). Acá es especialmente necesario: la
+          // columna de precio junta un input numérico + la etiqueta con el
+          // monto formateado + el texto de "Guardando.../✓ Guardado", que
+          // no entra de ninguna forma razonable en 320-375px de ancho.
+          <div>
+            <p className="mb-2 text-xs text-muted sm:hidden">← Desliza para ver toda la tabla →</p>
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <table className="w-full min-w-[480px] border-separate border-spacing-y-2 text-left text-sm">
+                {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
+                    tablas del panel (Equipos, Categorías, Reservas). */}
+                <thead>
+                  <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
+                    <th className="rounded-l-lg px-3 py-3">Provincia</th>
+                    <th className="rounded-r-lg px-3 py-3">Precio de viaje (RD$)</th>
+                  </tr>
+                </thead>
+                <tbody>
               {provinciasFiltradas.map((provincia) => (
                 <tr
                   key={provincia.id}
@@ -182,8 +191,10 @@ export default function ProvinciasAdminPage() {
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </div>
     </div>

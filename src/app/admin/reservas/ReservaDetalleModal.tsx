@@ -116,18 +116,25 @@ export default function ReservaDetalleModal({ reserva, onCerrar }: ReservaDetall
             <div>
               <dt className="text-muted">Cotización estimada</dt>
               <dd>
+                {/* "flex-wrap gap-x-2 gap-y-1" en cada fila (antes solo
+                    "justify-between"): mismo ajuste ya aplicado en la
+                    cotización del formulario público (ver
+                    FormularioReserva.tsx) — un nombre de equipo largo, en
+                    el ancho angosto de este modal en un celular, ya no
+                    empuja el precio fuera de la vista: pasa a su propia
+                    línea en vez de desbordar o recortarse. */}
                 <div className="mt-1 flex flex-col gap-1 rounded-lg border border-white/10 bg-background p-3">
                   {reserva.equipos.map((reservaEquipo) => (
-                    <div key={reservaEquipo.id} className="flex items-center justify-between">
+                    <div key={reservaEquipo.id} className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-muted">{reservaEquipo.equipo.nombre}</span>
                       <span>{formatearMoneda(Number(reservaEquipo.equipo.precio))}</span>
                     </div>
                   ))}
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                     <span className="text-muted">Viaje ({reserva.provincia.nombre})</span>
                     <span>{formatearMoneda(precioViaje)}</span>
                   </div>
-                  <div className="mt-1 flex items-center justify-between border-t border-white/10 pt-1 font-semibold">
+                  <div className="mt-1 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 border-t border-white/10 pt-1 font-semibold">
                     <span>Total estimado</span>
                     <span className="text-gradient-brand">{formatearMoneda(totalEstimado)}</span>
                   </div>

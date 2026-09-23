@@ -178,22 +178,40 @@ export default function CalendarioAdminPage() {
         Vista mensual de todos los eventos con reserva CONFIRMADA, sin importar el equipo.
       </p>
 
-      {/* --- Navegación entre meses --- */}
-      <div className="mt-6 flex items-center justify-between">
+      {/* --- Navegación entre meses ---
+          RESPONSIVO: antes los tres elementos ("‹ Mes anterior", el
+          nombre del mes, "Mes siguiente ›") iban en una sola fila sin
+          poder envolverse — el texto completo de los dos botones más el
+          título fácilmente supera los 320-375px de un celular, lo que
+          forzaba scroll horizontal de toda la página (el bug más visible
+          de esta pantalla en móvil). La solución NO es apilarlos (un
+          "Mes anterior"/"Mes siguiente" uno debajo del otro se ve raro y
+          ya no parece una barra de navegación) sino ACORTAR los botones
+          en pantallas chicas: el texto completo ("Mes anterior"/"Mes
+          siguiente") se oculta por debajo de "sm" y solo queda visible la
+          flecha, con suficiente padding para seguir siendo un objetivo
+          táctil cómodo — el "aria-label" conserva la etiqueta completa
+          para lectores de pantalla aunque el texto visible se oculte. Así
+          los tres elementos siempre entran en una fila, en cualquier ancho. */}
+      <div className="mt-6 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={manejarMesAnterior}
-          className={`rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-muted ${TRANSICION_HOVER} hover:border-brand-purple-light hover:text-foreground`}
+          aria-label="Mes anterior"
+          className={`shrink-0 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-muted ${TRANSICION_HOVER} hover:border-brand-purple-light hover:text-foreground`}
         >
-          ‹ Mes anterior
+          <span aria-hidden="true">‹</span>
+          <span className="hidden sm:inline"> Mes anterior</span>
         </button>
-        <h2 className="text-lg font-semibold">{nombreMesAnio(mes, anio)}</h2>
+        <h2 className="truncate text-center text-base font-semibold sm:text-lg">{nombreMesAnio(mes, anio)}</h2>
         <button
           type="button"
           onClick={manejarMesSiguiente}
-          className={`rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-muted ${TRANSICION_HOVER} hover:border-brand-purple-light hover:text-foreground`}
+          aria-label="Mes siguiente"
+          className={`shrink-0 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-muted ${TRANSICION_HOVER} hover:border-brand-purple-light hover:text-foreground`}
         >
-          Mes siguiente ›
+          <span className="hidden sm:inline">Mes siguiente </span>
+          <span aria-hidden="true">›</span>
         </button>
       </div>
 
@@ -234,12 +252,18 @@ export default function CalendarioAdminPage() {
               const tieneEventos = reservasDelDia !== undefined && reservasDelDia.length > 0;
 
               return (
+                // "text-xs sm:text-sm" (antes "text-sm" fijo) y "gap-0.5
+                // sm:gap-1": en una celda de ~30-35px de lado (7 columnas
+                // en 320-375px de ancho), el número del día a text-sm más
+                // el indicador debajo ya no entraban verticalmente sin
+                // recortarse — con texto más chico y menos separación en
+                // móvil, ambos caben cómodos dentro del cuadrado.
                 <button
                   key={dia}
                   type="button"
                   disabled={!tieneEventos}
                   onClick={() => setDiaSeleccionado(dia)}
-                  className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border text-sm ${TRANSICION_HOVER} ${
+                  className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-lg border text-xs sm:gap-1 sm:text-sm ${TRANSICION_HOVER} ${
                     tieneEventos
                       ? "border-brand-orange/40 bg-brand-orange/10 font-semibold text-foreground hover:border-brand-orange hover:bg-brand-orange/20"
                       : "border-white/5 text-muted"
@@ -250,7 +274,7 @@ export default function CalendarioAdminPage() {
                       ese día, para distinguir de un vistazo "1 evento" de
                       "varios eventos" sin abrir el detalle. */}
                   {tieneEventos && (
-                    <span className="flex items-center gap-1 text-[10px] text-brand-orange">
+                    <span className="flex items-center gap-1 text-[9px] text-brand-orange sm:text-[10px]">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-orange" aria-hidden="true" />
                       {reservasDelDia!.length}
                     </span>

@@ -104,7 +104,10 @@ export default function PublicacionesAdminPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      {/* "flex-wrap gap-3" (antes sin wrap): mismo ajuste que
+          admin/equipos/page.tsx — en un celular angosto el título+subtítulo
+          y el botón ya no entran en una sola fila sin desbordar. */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Publicaciones</h1>
           <p className="mt-1 text-muted">Fotos y videos de eventos ya realizados.</p>

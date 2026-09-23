@@ -173,16 +173,25 @@ export default function CategoriasAdminPage() {
         {!cargando && error && <ErrorMessage message={error} />}
 
         {!cargando && !error && (
-          <table className="w-full max-w-2xl border-separate border-spacing-y-2 text-left text-sm">
-            {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
-                tablas del panel (Equipos, Reservas). */}
-            <thead>
-              <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
-                <th className="rounded-l-lg px-3 py-3">Nombre</th>
-                <th className="rounded-r-lg px-3 py-3">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
+          // Mismo patrón responsivo de scroll horizontal contenido que el
+          // resto de las tablas del panel (ver el comentario largo en
+          // admin/equipos/page.tsx). Esta tabla es más angosta (solo 2
+          // columnas), pero la columna "Acciones" en modo edición (input +
+          // "Guardar"/"Cancelar") sigue necesitando más ancho del que cabe
+          // en 320-375px sin comprimirse mal.
+          <div>
+            <p className="mb-2 text-xs text-muted sm:hidden">← Desliza para ver toda la tabla →</p>
+            <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <table className="w-full min-w-[420px] max-w-2xl border-separate border-spacing-y-2 text-left text-sm">
+                {/* Mismo tratamiento de encabezado "sobrio" que el resto de las
+                    tablas del panel (Equipos, Reservas). */}
+                <thead>
+                  <tr className="bg-background-surface text-xs font-semibold uppercase tracking-wide text-muted">
+                    <th className="rounded-l-lg px-3 py-3">Nombre</th>
+                    <th className="rounded-r-lg px-3 py-3">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
               {categorias.map((categoria) => (
                 <tr key={categoria.id} className={`rounded-lg bg-background-surface hover:bg-brand-purple/10 ${TRANSICION_HOVER}`}>
                   <td className="rounded-l-lg px-3 py-3">
@@ -248,8 +257,10 @@ export default function CategoriasAdminPage() {
                   </td>
                 </tr>
               )}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
         {idEditando !== null && errorEditar && (
           <div className="mt-3 max-w-md">
