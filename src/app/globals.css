@@ -1,26 +1,286 @@
-@import "tailwindcss";
+/* Directivas base de Tailwind: inyectan los estilos de reinicio (base),
+   clases de componentes y las utilidades generadas a partir de tailwind.config.ts. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Variables CSS con los mismos hex de la paleta de marca definida en
+   tailwind.config.ts (colors.brand / colors.background). Se exponen acá
+   además de en Tailwind porque el degradado de fondo del body y el tema de
+   react-day-picker más abajo son CSS "plano" (no clases de Tailwind), y así
+   evitan repetir los valores hex sueltos en varios lugares del archivo. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg-deep-from: #0a0612;
+  --color-bg-deep-to: #120a1f;
+  --color-brand-purple: #7c3aed;
+  --color-brand-pink: #ec4899;
+  --color-brand-orange: #f97316;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Fondo del sitio: negro casi puro con un degradado sutil hacia morado
+   profundo (de arriba hacia abajo), en vez de un color plano. bg-background
+   se mantiene como color de respaldo (por si el degradado no llegara a
+   pintarse) y como el valor que siguen usando utilidades como "bg-background". */
+body {
+  @apply bg-background text-foreground;
+  background-image: linear-gradient(180deg, var(--color-bg-deep-from) 0%, var(--color-bg-deep-to) 100%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Utilidad reutilizable de "texto en degradado": pinta el degradado de
+   marca (morado -> rosa -> naranja) directamente sobre el texto, para
+   títulos destacados en cualquier parte del sitio. background-clip:text
+   recorta el fondo a la forma de los glifos; el texto en sí se vuelve
+   transparente para dejar ver ese fondo en vez del color de "foreground". */
+.text-gradient-brand {
+  background-image: linear-gradient(90deg, var(--color-brand-purple), var(--color-brand-pink), var(--color-brand-orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ==========================================
+   Tema oscuro para cualquier <select> nativo que quede en el sitio.
+   Los navegadores permiten pintar el <select> en sí con CSS normal, pero
+   la lista desplegable de sus <option> la dibuja cada navegador con SUS
+   PROPIOS colores del sistema (típicamente fondo blanco + texto gris
+   oscuro), casi sin importar el CSS de la página — por eso se ve
+   "rota" contra el fondo oscuro del sitio. Esta regla fuerza el fondo y
+   el texto oscuro/claro en la mayor medida que el navegador lo permite:
+   funciona bien en Chrome/Edge/Firefox modernos, pero no en el 100% de
+   los casos (ej. Safari en algunas versiones ignora el estilo de
+   "option" y sigue mostrando su propio tema).
+   Es una red de seguridad para cualquier <select> nativo que aparezca
+   más adelante: los tres que existían con este problema (Provincia,
+   Categoría de equipo, Equipo protagonista de una publicación) ya se
+   reemplazaron por SelectorPersonalizado.tsx, que no depende de esto en
+   absoluto porque no usa un <select> real.
+   ========================================== */
+select,
+select option {
+  background-color: var(--color-bg-deep-to);
+  color: #f2f2f5;
+}
+
+/* ==========================================
+   Tema oscuro para react-day-picker (CalendarioDisponibilidad.tsx).
+   La librería se personaliza con variables CSS propias en vez de clases de
+   Tailwind, así que se sobreescriben aquí. Antes usaban el acento cian
+   original; se migran al morado de marca para que el calendario del
+   formulario de reserva ya no muestre cian suelto.
+   ========================================== */
+/* Selector compuesto (".rdp-root.rdp-tema-oscuro") a propósito: DayPicker
+   pone el className que le pasamos en el MISMO elemento que ya tiene la
+   clase "rdp-root", y ese elemento define ahí sus propios valores por
+   defecto (--rdp-accent-color: blue, etc.). Con solo ".rdp-tema-oscuro" el
+   empate de especificidad lo gana el CSS de la librería según el orden en
+   que Next cargue los archivos; el selector compuesto (dos clases) tiene
+   mayor especificidad y gana siempre, sin depender de ese orden. */
+.rdp-root.rdp-tema-oscuro {
+  --rdp-accent-color: var(--color-brand-purple); /* día de hoy y borde del día seleccionado */
+  --rdp-accent-background-color: rgba(124, 58, 237, 0.18); /* fondo sutil para el día seleccionado */
+  --rdp-today-color: var(--color-brand-purple);
+  --rdp-disabled-opacity: 0.35; /* días pasados: se ven claramente apagados */
+}
+
+/* Días con reserva CONFIRMADA: además de estar deshabilitados, se marcan
+   con un tono rojizo para distinguirlos de un simple día pasado. */
+.rdp-tema-oscuro .dia-reservado:not(.rdp-selected) {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f2f2f5;
+}
+
+/* RESPONSIVO: react-day-picker dibuja cada celda de fecha a 44px de ancho
+   por defecto (7 columnas = 308px), sin contar la fila de navegación. En
+   un celular angosto (320px) eso ya no entra dentro del formulario de
+   reserva (que además tiene su propio padding lateral) y el mes queda
+   cortado o provoca scroll horizontal. Bajo ese ancho se reduce el
+   tamaño de celda vía las variables CSS propias de la librería (no hay
+   clases de Tailwind para esto: DayPicker no acepta props de tamaño, solo
+   estas variables), lo suficiente para que las 7 columnas quepan
+   completas sin scroll. */
+@media (max-width: 380px) {
+  .rdp-root.rdp-tema-oscuro {
+    --rdp-day-width: 2.15rem;
+    --rdp-day-height: 2.15rem;
+    --rdp-day_button-width: 2rem;
+    --rdp-day_button-height: 2rem;
+    --rdp-nav_button-width: 1.75rem;
+    --rdp-nav_button-height: 1.75rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================
+   Animación de OndaDivisoria.tsx: desplazamiento horizontal infinito de
+   cada capa de onda.
+   Por qué "translateX(-100%)" y no un valor fijo en px: cada capa dibuja
+   su path DOS veces (ver el componente), la segunda copia desplazada
+   exactamente un ancho de viewport hacia la derecha (transform SVG
+   "translate(1440 0)"). Un elemento SVG sin caja de layout propia (como
+   <g>) resuelve los porcentajes de "transform" contra el viewport del
+   <svg> que lo contiene — es decir, -100% es SIEMPRE "un ancho de
+   viewport completo", sin importar a cuántos px CSS se termine
+   renderizando esa franja en pantalla (responsive por diseño). Al llegar
+   a -100%, la copia duplicada queda exactamente donde arrancó la
+   original: el reinicio del bucle ("from" -> "to" -> "from") es invisible.
+   ========================================== */
+@keyframes onda-desplazamiento {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Solo se anima "transform" (nunca "d", "width" ni ninguna propiedad de
+   layout): el navegador puede mover estas capas en la GPU sin tener que
+   recalcular el layout ni repintar el resto de la página en cada frame. */
+.onda-capa {
+  animation-name: onda-desplazamiento;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Duraciones ligeramente distintas por capa (efecto parallax sutil): la
+   capa de atrás (más tenue) se mueve más lento, como si estuviera más
+   lejos; la del frente (más opaca) se mueve más rápido, como si estuviera
+   más cerca. Todas son lentas a propósito ("respiración", no un scroll
+   brusco). */
+.onda-capa-atras {
+  animation-duration: 34s;
+}
+.onda-capa-media {
+  animation-duration: 26s;
+}
+.onda-capa-frente {
+  animation-duration: 19s;
+}
+
+/* ==========================================
+   Barras tipo ecualizador, superpuestas sobre la base sólida de la onda
+   (ver OndaDivisoria.tsx). Cada barra solo anima "transform: scaleY()"
+   con "transform-origin: bottom": crece/decrece hacia arriba sin nunca
+   tocar su "height" real (evita layout/reflow), y sin JavaScript
+   recalculando nada en cada frame.
+
+   Son 4 curvas de animación distintas ("ecualizador-1" a "ecualizador-4"),
+   no una por barra: la variedad real viene de combinar estas 4 formas con
+   una duración y un delay distintos POR BARRA (asignados en el componente
+   con una función determinística, no Math.random(), para que el resultado
+   sea el mismo en servidor y cliente). Esa combinación alcanza para que
+   ninguna barra se vea sincronizada con otra, sin tener que escribir
+   decenas de @keyframes.
+   ========================================== */
+@keyframes ecualizador-1 {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes ecualizador-2 {
+  0%,
+  100% {
+    transform: scaleY(0.9);
+  }
+  40% {
+    transform: scaleY(0.35);
+  }
+  70% {
+    transform: scaleY(0.7);
+  }
+}
+@keyframes ecualizador-3 {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  30% {
+    transform: scaleY(1);
+  }
+  65% {
+    transform: scaleY(0.45);
+  }
+}
+@keyframes ecualizador-4 {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  55% {
+    transform: scaleY(0.95);
+  }
+}
+
+.barra-ecualizador {
+  transform-origin: bottom;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.barra-ecualizador-0 {
+  animation-name: ecualizador-1;
+}
+.barra-ecualizador-1 {
+  animation-name: ecualizador-2;
+}
+.barra-ecualizador-2 {
+  animation-name: ecualizador-3;
+}
+.barra-ecualizador-3 {
+  animation-name: ecualizador-4;
+}
+
+/* ==========================================
+   Pulso del botón flotante de WhatsApp (BotonWhatsApp.tsx): un latido
+   lento y sutil (crece levemente y vuelve a su tamaño original), pensado
+   para llamar la atención sin resultar molesto — mucho más lento (2.5s
+   por ciclo) que cualquier otra animación del sitio. Solo anima
+   "transform" (nunca "width"/"height"), mismo criterio que el resto de
+   las animaciones de acá arriba, para que el navegador no tenga que
+   recalcular layout en cada frame.
+   ========================================== */
+@keyframes pulso-whatsapp {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.whatsapp-pulso {
+  animation: pulso-whatsapp 2.5s ease-in-out infinite;
+}
+
+/* Al pasar el mouse se pausa el pulso: si no, compite con el propio
+   "transform: scale" del hover (ambos animan la misma propiedad a la
+   vez) y el botón se ve tembloroso en vez de agrandarse suave. Con el
+   pulso pausado, el hover queda como la única animación de "transform"
+   activa en ese momento. */
+.whatsapp-pulso:hover {
+  animation-play-state: paused;
+}
+
+/* Accesibilidad: si el sistema del visitante tiene activada la preferencia
+   de "reducir movimiento", se apaga TODA la animación de la franja (las
+   ondas y las barras quedan fijas en su posición/tamaño base) y el pulso
+   de WhatsApp, en vez de forzar el movimiento sin importar esa preferencia.
+   IMPORTANTE: este bloque debe ir DESPUÉS de las reglas ".whatsapp-pulso"
+   de arriba en el archivo — con la misma especificidad (una sola clase),
+   CSS resuelve un empate por ORDEN DE APARICIÓN, así que si este bloque
+   quedara antes, la regla ".whatsapp-pulso { animation: pulso-whatsapp
+   ... }" de más arriba ganaría siempre sin importar si la media query
+   coincide o no (bug real que se encontró así, con Playwright emulando
+   esta preferencia y confirmando que el pulso NO se apagaba). */
+@media (prefers-reduced-motion: reduce) {
+  .onda-capa,
+  .barra-ecualizador,
+  .whatsapp-pulso {
+    animation: none;
+  }
 }
